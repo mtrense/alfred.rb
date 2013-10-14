@@ -17,31 +17,31 @@ require 'plist'
 
 module Alfred
 	
+	TYPE_MAP = {
+		:keyword => 'alfred.workflow.input.keyword',
+		:filter => 'alfred.workflow.input.scriptfilter',
+		:notification => 'alfred.workflow.output.notification',
+		:script => 'alfred.workflow.action.script',
+		:copy => 'alfred.workflow.output.clipboard',
+		:openurl => 'alfred.workflow.action.openurl'
+	}
+	
 	def workflow(&block)
 		wf = Workflow.new
 		wf.instance_exec &block if block
-		wf.generate_spec
+		Plist::Emit.dump wf.generate_spec
 	end
 	
 	def workflow!(&block)
-		File.open('info.plist', 'attr_writer :attr_names') {|file| file << workflow(&block) }
+		File.open('info.plist', 'w') {|file| file << workflow(&block) }
 	end
 	
 	class Workflow
 		require 'alfred/workflow/step'
 		require 'alfred/workflow/connection'
 		
-		def initialize
-			@author = ''
-			@description = ''
-			@disabled = false
-			@readme = ''
-			@url = ''
-		end
-		
 		def id(id)
 			@id = id
-			@name = id[/[^.]+$/] unless @name
 		end
 		
 		def name(name)
@@ -68,32 +68,43 @@ module Alfred
 			@url = url
 		end
 		
-		def step(name, &block)
+		def filter(name, &block)
+			step(:filter, FilterStep, &block)
+		end
+		
+		def notification(name, &block)
+			step(:notification, NotificationStep, &block)
+		end
+		
+		def step(type, type_class, name = type, &block)
 			@steps ||= {}
-			step = Step.new self, name.to_sym
+			step = type_class.new self, name.to_sym
 			step.instance_exec &block if block
 			@steps[name.to_sym] = step
 		end
 		
 		def generate_spec
-			builder = {}
-			builder['bundleid'] = @id
-			builder['name'] = @name
-			builder['author'] = @author
-			builder['description'] = @description
-			builder['disabled'] = @disabled
-			builder['readme'] = @readme
-			builder['url'] = @url
-			# TODO: generate objects and connections
-			Plist::Emit.dump builder
-		end
-		
-		def generate_objects
-			
+			{}.tap do |builder|
+				builder['bundleid'] = @id
+				builder['name'] = @name || @id[/[^.]+$/]
+				builder['author'] = @author || ''
+				builder['description'] = @description || ''
+				builder['disabled'] = @disabled || false
+				builder['readme'] = @readme || ''
+				builder['url'] = @url || ''
+				builder['objects'] = @steps.collect do |name, step|
+					step.generate_spec
+				end
+				builder['connections'] = generate_connections
+			end
 		end
 		
 		def generate_connections
-			
+			{}.tap do |builder|
+				@steps.collect do |name, step|
+					builder[name] = step.generate_connections
+				end
+			end
 		end
 		
 	end

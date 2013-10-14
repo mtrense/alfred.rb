@@ -19,9 +19,18 @@ module Alfred
 		
 		class Connection
 			
-			def initialize(workflow, name)
+			def initialize(workflow, source, target)
 				@workflow = workflow
-				@name = name
+				@source = source
+				@target = target
+			end
+			
+			def generate_connection
+				{}.tap do |builder|
+					builder['destinationuid'] = @target
+					builder['modifiers'] = @modifiers || 0
+					builder['modifiersubtext'] = @subtext || ''
+				end
 			end
 			
 		end
