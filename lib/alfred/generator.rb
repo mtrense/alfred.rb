@@ -35,18 +35,8 @@ module Alfred
 			template 'alfred/generator/Rakefile.erb', "#{name}/Rakefile"
 		end
 		
-		desc 'spec', 'Generates Alfreds workflow spec'
-		def spec
-			
-		end
-		
 		desc 'update', 'Updates local libs from gem'
 		def update
-			
-		end
-		
-		desc 'bundle', 'Bundles this workflow so it can be imported in Alfred'
-		def bundle
 			
 		end
 		
