@@ -160,6 +160,30 @@ module Alfred
 			
 		end
 		
+		class OpenURLStep < Step
+			
+			def url(url)
+				@url = url
+			end
+			
+			def utf8(utf8)
+				@utf8 = utf8
+			end
+			
+			def plusspaces(plusspaces)
+				@plusspaces = plusspaces
+			end
+			
+			def generate_config
+				{}.tap do |builder|
+					builder['url'] = @url || ''
+					builder['utf8'] = @utf8 || true
+					builder['plusspaces'] = @plusspaces || false
+				end
+			end
+			
+		end
+		
 	end
 	
 end

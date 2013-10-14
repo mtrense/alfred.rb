@@ -76,6 +76,10 @@ module Alfred
 			step(:notification, NotificationStep, &block)
 		end
 		
+		def openurl(name, &block)
+			step(:openurl, OpenURLStep, &block)
+		end
+		
 		def step(type, type_class, name = type, &block)
 			@steps ||= {}
 			step = type_class.new self, name.to_sym
