@@ -19,16 +19,35 @@ module Alfred
 		
 		class Connection
 			
-			def initialize(workflow, source, target)
+			MODIFIER_MAP = { :none => 0, :ctrl => 262144, :alt => 524288, :cmd => 1048576, :fn => 8388608, :shift => 131072 }
+			
+			def initialize(workflow, source, destination = nil)
 				@workflow = workflow
 				@source = source
-				@target = target
+				@destination = destination
+			end
+			
+			def destination(destination)
+				@destination = destination
+			end
+			
+			# 262144 = ctrl
+			# 524288 = alt
+			# 1048576 = cmd
+			# 8388608 = fn
+			# 131072 = shift
+			def modifier(modifier)
+				@modifier = modifier
+			end
+			
+			def subtext(subtext)
+				@subtext = subtext
 			end
 			
 			def generate_connection
 				{}.tap do |builder|
-					builder['destinationuid'] = @target
-					builder['modifiers'] = @modifiers || 0
+					builder['destinationuid'] = @destination
+					builder['modifiers'] = MODIFIER_MAP[@modifier || :none]
 					builder['modifiersubtext'] = @subtext || ''
 				end
 			end
