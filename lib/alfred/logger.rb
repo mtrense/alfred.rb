@@ -13,20 +13,33 @@
 #	See the License for the specific language governing permissions and
 #	limitations under the License.
 
+require 'syslog'
+
 module Alfred
 	
-	class Logger
-		
-	  class <<self
-	    def logger
-	      @logger ||= ::Logger.new('/tmp/alfred.log').tap do |logger|
-	        logger.level = Logger::WARN
-	      end
-	    end
-	  end
-	  
-
-		
+	def debug(message)
+		log(:debug, message)
+	end
+	
+	def info(message)
+		log(:info, message)
+	end
+	
+	def warn(message)
+		log(:warning, message)
+	end
+	
+	def error(message)
+		log(:err, message)
+	end
+	
+	def fatal(message)
+		log(:critical, message)
+	end
+	
+	private
+	def log(severity, message)
+		Syslog.open('Alfred-workflow', Syslog::LOG_PID) {|log| log.send severity.to_sym, message }
 	end
 	
 end
