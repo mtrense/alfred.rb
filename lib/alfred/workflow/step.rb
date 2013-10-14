@@ -87,7 +87,7 @@ module Alfred
 				@keyword = keyword
 			end
 			
-			# or'ed
+			# arguments are or'ed
 			# 1 = spaces
 			# 2 = backquotes
 			# 4 = dquotes
