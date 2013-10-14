@@ -90,18 +90,8 @@ module Alfred
 		
 		class Item
 			
-			def initialize
-				@subtitle ||= ""
-				@icon ||= { :type => "default", :name => "icon.png" }
-				@valid ||= true
-				@type ||= "default"
-			end
-			
 			def title(title)
 				@title = title
-				@uid ||= "#{@title} #{Feedback.start_time}"
-				@autocomplete ||= @title
-				@arg ||= @title
 			end
 			
 			def subtitle(subtitle)
@@ -134,18 +124,34 @@ module Alfred
 			
 			def to_xml
 				unless @title.nil?
-					element = REXML::Element.new('item')
-
-					element.add_attributes 'uid' => @uid, 'arg' => @arg, 'valid' => @valid.to_yes_no, 'autocomplete' => @autocomplete
-					element.add_attributes 'type' => 'file' if @type == "file"
-					REXML::Element.new('title', element).text    = @title
-					REXML::Element.new('subtitle', element).text = @subtitle
-					icon = REXML::Element.new("icon", element)
-					icon.text = @icon[:name]
-					icon.add_attributes('type' => 'fileicon') if @icon[:type] == "fileicon"
-					
-					element
+					fill_defaults
+					validate
+					# Generate XML
+					REXML::Element.new('item').tap do |element|
+						element.add_attributes 'uid' => @uid, 'arg' => @arg, 'valid' => @valid.to_yes_no, 'autocomplete' => @autocomplete
+						element.add_attributes 'type' => 'file' if @type == "file"
+						REXML::Element.new('title', element).text    = @title
+						REXML::Element.new('subtitle', element).text = @subtitle
+						icon = REXML::Element.new("icon", element)
+						icon.text = @icon[:name]
+						icon.add_attributes('type' => 'fileicon') if @icon[:type] == "fileicon"
+					end
 				end
+			end
+			
+			private
+			def fill_defaults
+				@uid ||= "#{@title} #{Feedback.start_time}"
+				@icon ||= { :type => "default", :name => "icon.png" }
+				@valid = true if @valid.nil?
+				@type ||= "default"
+				@autocomplete ||= @title
+				@arg ||= @title
+				@subtitle ||= ""
+			end
+			
+			def validate
+				(@title and not @title.empty?) or raise 'Title must be set'
 			end
 			
 		end
