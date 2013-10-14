@@ -25,6 +25,10 @@ module Alfred
 				@name = name
 			end
 			
+			def uid(uid)
+				@uid = uid
+			end
+			
 			def ypos(ypos)
 				@ypos = ypos
 			end
@@ -40,7 +44,7 @@ module Alfred
 				{}.tap do |builder|
 					builder['config'] = generate_config
 					builder['type'] = Alfred::TYPE_MAP[@type]
-					builder['uid'] = @name || ''
+					builder['uid'] = @uid || @name || ''
 					builder['version'] = @version || 0
 				end
 			end
