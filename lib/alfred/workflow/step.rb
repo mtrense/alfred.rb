@@ -29,9 +29,10 @@ module Alfred
 				@ypos = ypos
 			end
 			
-			def connect(target, &block)
+			def connect(target = nil, &block)
 				@connections ||= []
 				connection = Connection.new @workflow, self, target
+				connection.instance_exec &block if block
 				@connections << connection
 			end
 			
