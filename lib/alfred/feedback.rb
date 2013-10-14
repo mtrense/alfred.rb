@@ -21,9 +21,10 @@ module Alfred
 		begin
 			Feedback.build &block
 		rescue Exception => e
+			error("#{e.class.name}: #{e.message}")
 			Feedback.build do
 				item do
-					title "Exception caught: #{e.class}"
+					title "Exception caught: #{e.class.name}"
 					subtitle "Message: #{e.message}."
 					valid false
 				end
@@ -32,12 +33,13 @@ module Alfred
 	end
 	
 	def feedback!(&block)
-		puts feedback(&block).to_xml
+		puts feedback(&block).to_xml.to_s
 	end
 	
 	class Feedback
 		
 		class <<self
+			
 			def start_time
 				@time ||= Time.now.to_s
 			end
@@ -55,24 +57,21 @@ module Alfred
 				feedback
 			end
 			
-			def generate(&block)
-				puts build(&block).to_xml
-			end
 		end
 		
 		def items
 			@items ||= []
 		end
 		
-		def to_xml(items = @items)
+		def to_xml
 			document = REXML::Element.new("items")
-			items.each do |item|
+			@items.each do |item|
 				if item_element = item.to_xml
 					document << item_element
 				end
 			end
 			
-			document.to_s
+			document
 		end
 		
 		def item(&block)
@@ -122,34 +121,49 @@ module Alfred
 				@type = type
 			end
 			
+			def to_hash
+				uid = @uid || "#{@title} #{Feedback.start_time}"
+				arg = @arg || @title
+				valid = @valid.nil? ? true : @valid
+				autocomplete = @autocomplete || @title
+				type = @type || 'default'
+				subtitle = @subtitle || ''
+				icontext = (@icon and @icon.include?(:name)) ? @icon[:name] : 'icon.png'
+				icontype = (@icon and @icon.include?(:type)) ? @icon[:type] : 'fileicon'
+				{
+					:uid => uid,
+					:arg => arg,
+					:valid => valid,
+					:autocomplete => autocomplete,
+					:type => type,
+					:title => @title,
+					:subtitle => subtitle,
+					:icon => { 
+						:text => icontext, 
+						:type => icontype
+					}
+				}
+			end
+			
 			def to_xml
 				unless @title.nil?
-					fill_defaults
 					validate
 					# Generate XML
+					hash = to_hash
 					REXML::Element.new('item').tap do |element|
-						element.add_attributes 'uid' => @uid, 'arg' => @arg, 'valid' => @valid.to_yes_no, 'autocomplete' => @autocomplete
-						element.add_attributes 'type' => 'file' if @type == "file"
-						REXML::Element.new('title', element).text    = @title
-						REXML::Element.new('subtitle', element).text = @subtitle
+						element.add_attributes 'uid' => hash[:uid], 'arg' => hash[:arg], 'valid' => hash[:valid].to_yes_no, 
+							'autocomplete' => hash[:autocomplete]
+						element.add_attributes 'type' => hash[:type]
+						REXML::Element.new('title', element).text = hash[:title]
+						REXML::Element.new('subtitle', element).text = hash[:subtitle]
 						icon = REXML::Element.new("icon", element)
-						icon.text = @icon[:name]
-						icon.add_attributes('type' => 'fileicon') if @icon[:type] == "fileicon"
+						icon.text = hash[:icon][:text]
+						icon.add_attributes('type' => hash[:icon][:type])
 					end
 				end
 			end
 			
 			private
-			def fill_defaults
-				@uid ||= "#{@title} #{Feedback.start_time}"
-				@icon ||= { :type => "default", :name => "icon.png" }
-				@valid = true if @valid.nil?
-				@type ||= "default"
-				@autocomplete ||= @title
-				@arg ||= @title
-				@subtitle ||= ""
-			end
-			
 			def validate
 				(@title and not @title.empty?) or raise 'Title must be set'
 			end
