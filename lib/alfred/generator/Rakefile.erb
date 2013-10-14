@@ -10,7 +10,15 @@ end
 
 desc 'Generate bundle to import into Alfred'
 task :bundle => [ :build_spec ] do
-	`zip -r ../<%= @name %>.alfredworkflow *`
+	zip = IO.popen "zip -r -@ ../<%= @name %>.alfredworkflow", 'w+'
+	Rake::FileList['**/*'].each do |file|
+		case file
+		when 'Rakefile', 'workflow_spec.rb'
+		else
+			zip.write "#{file}\n"
+		end
+	end
+	zip.close_write
 end
 
 desc 'Opens your local Alfred and imports this workflow'
