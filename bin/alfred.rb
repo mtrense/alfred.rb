@@ -15,10 +15,7 @@
 #	limitations under the License.
 
 require 'byebug'
-
-require 'alfred'
-require 'alfred/generator'
-require 'alfred/workflow'
+require 'alfred/development'
 
 Alfred::Generator.start ARGV
 
