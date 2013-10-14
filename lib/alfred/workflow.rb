@@ -19,10 +19,12 @@ module Alfred
 	
 	TYPE_MAP = {
 		:keyword => 'alfred.workflow.input.keyword',
-		:filter => 'alfred.workflow.input.scriptfilter',
-		:notification => 'alfred.workflow.output.notification',
+		:hotkey => 'alfred.workflow.trigger.hotkey',
 		:script => 'alfred.workflow.action.script',
-		:copy => 'alfred.workflow.output.clipboard',
+		:filter => 'alfred.workflow.input.scriptfilter',
+		:clipboard => 'alfred.workflow.output.clipboard',
+		:notification => 'alfred.workflow.output.notification',
+		:large_type => 'alfred.workflow.output.largetype',
 		:openurl => 'alfred.workflow.action.openurl'
 	}
 	
@@ -68,12 +70,32 @@ module Alfred
 			@url = url
 		end
 		
+		def keyword(name, &block)
+			step(:keyword, KeywordStep, &block)
+		end
+		
+		def hotkey(name, &block)
+			step(:hotkey, HotkeyStep, &block)
+		end
+		
+		def script(name, &block)
+			step(:script, ScriptStep, &block)
+		end
+		
 		def filter(name, &block)
 			step(:filter, FilterStep, &block)
 		end
 		
+		def clipboard(name, &block)
+			step(:clipboard, ClipboardStep, &block)
+		end
+		
 		def notification(name, &block)
 			step(:notification, NotificationStep, &block)
+		end
+		
+		def large_type(name, &block)
+			step(:large_type, LargeTypeStep, &block)
 		end
 		
 		def openurl(name, &block)
