@@ -18,11 +18,21 @@ require 'rexml/document'
 module Alfred
 	
 	def feedback(&block)
-		Feedback.build &block
+		begin
+			Feedback.build &block
+		rescue Exception => e
+			Feedback.build do
+				item do
+					title "Exception caught: #{e.class}"
+					subtitle "Message: #{e.message}."
+					valid false
+				end
+			end
+		end
 	end
 	
 	def feedback!(&block)
-		Feedback.generate &block
+		puts feedback(&block).to_xml
 	end
 	
 	class Feedback
