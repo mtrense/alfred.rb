@@ -1,10 +1,20 @@
 
-require 'alfred'
-require 'alfred/workflow'
+id 'com.example.<%= @name %>'
+name '<%= @name %>'
+author 'me@example.com'
 
-workflow! do
-	id 'com.example.<%= @name %>'
-	name '<%= @name %>'
-	author 'me@example.com'
+filter :show_list do
 	
+	script 'ruby sample_script_filter.rb'
+#	connect :open_url
+	connect :notification
+end
+
+#step :openurl do
+#	
+#end
+
+notification :notification do
+	text 'with {query}'
+	title 'Opening browser...'
 end

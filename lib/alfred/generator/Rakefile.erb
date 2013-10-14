@@ -1,10 +1,14 @@
 require 'alfred/development'
 
+desc '(Re-)Generate workflow spec'
 task :build_spec do
 	spec = File.read('workflow_spec.rb')
-	Alfred.instance_eval spec
+	Alfred.workflow! do
+		instance_eval spec, 'workflow_spec.rb', 1
+	end
 end
 
+desc 'Generate bundle to import into Alfred'
 task :bundle => [:build_spec] do
 	
 end

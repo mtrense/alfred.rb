@@ -32,6 +32,7 @@ module Alfred
 			end
 			template 'alfred/generator/sample_script_filter.rb.erb', "#{name}/sample_script_filter.rb"
 			template 'alfred/generator/workflow_spec.rb.erb', "#{name}/workflow_spec.rb"
+			template 'alfred/generator/Rakefile.erb', "#{name}/Rakefile"
 		end
 		
 		desc 'spec', 'Generates Alfreds workflow spec'
