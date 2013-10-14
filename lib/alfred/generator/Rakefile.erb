@@ -9,6 +9,11 @@ task :build_spec do
 end
 
 desc 'Generate bundle to import into Alfred'
-task :bundle => [:build_spec] do
-	
+task :bundle => [ :build_spec ] do
+	`zip -r ../<%= @name %>.alfredworkflow *`
+end
+
+desc 'Opens your local Alfred and imports this workflow'
+task :install => [ :bundle ] do
+	`open ../<%= @name %>.alfredworkflow`
 end
