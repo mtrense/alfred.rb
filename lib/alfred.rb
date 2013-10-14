@@ -15,11 +15,11 @@
 
 
 module Alfred
-	require 'alfred/version'
-	require 'alfred/feedback'
-	require 'alfred/settings'
+#	require 'alfred/feedback'
+#	require 'alfred/settings'
 	require 'alfred/logger'
+	require 'alfred/util'
 	
-	
+	extend Alfred
 	
 end
