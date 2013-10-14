@@ -60,22 +60,10 @@ module Alfred
 			end
 		end
 		
-		def initialize
-			@items = []
-		end
-
 		def items
 			@items ||= []
 		end
 		
-		def add_item(opts = {})
-			item = Item.new
-			opts.each do |meth, value|
-				item.send meth.to_sym, value if item.respond_to?(meth.to_sym)
-			end
-			@items << item
-		end
-
 		def to_xml(items = @items)
 			document = REXML::Element.new("items")
 			items.each do |item|
