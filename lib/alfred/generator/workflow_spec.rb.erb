@@ -4,15 +4,22 @@ name '<%= @name %>'
 author 'me@example.com'
 
 filter :show_list do
-	
-	script 'ruby sample_script_filter.rb'
-#	connect :open_url
+	keyword 'testurl'
+	script <<-EOF
+		require 'sample_script_filter.rb'
+		list_urls
+	EOF
+	script_type :ruby
+	connect :openurl do
+		modifier :cmd
+		subtext 'Open URL'
+	end
 	connect :notification
 end
 
-#step :openurl do
-#	
-#end
+openurl :openurl do
+	url '{query}'
+end
 
 notification :notification do
 	text 'with {query}'
